@@ -1,5 +1,7 @@
-const std = @import("std");
+const lib = @import("lib/false.zig");
+const util = @import("lib/util.zig");
 
-pub fn handler(_alloc: *std.mem.Allocator, _args: *std.process.ArgIterator) !void {
-    std.process.exit(1);
+pub fn main() !void {
+    const m = util.Mainer(@TypeOf(lib.handler)){ .h = lib.handler };
+    return m.main();
 }

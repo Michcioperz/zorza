@@ -1,18 +1,28 @@
-const Builder = @import("std").build.Builder;
+const std = @import("std");
+const Builder = std.build.Builder;
 
 pub fn build(b: *Builder) void {
-    // Standard target options allows the person running `zig build` to choose
-    // what target to build for. Here we do not override the defaults, which
-    // means any target is allowed, and the default is native. Other options
-    // for restricting supported target set are available.
     const target = b.standardTargetOptions(.{});
-
-    // Standard release options allow the person running `zig build` to select
-    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
+    b.setPreferredReleaseMode(.ReleaseSmall);
     const mode = b.standardReleaseOptions();
 
-    const exe = b.addExecutable("zorza", "src/oneinall.zig");
-    exe.setTarget(target);
-    exe.setBuildMode(mode);
-    exe.install();
+    inline for (.{
+        "src/zorza.zig",
+        "src/cat.zig",
+        "src/md5sum.zig",
+        "src/sha1sum.zig",
+        "src/sha224sum.zig",
+        "src/sha256sum.zig",
+        "src/sha384sum.zig",
+        "src/sha512sum.zig",
+        "src/true.zig",
+        "src/false.zig",
+    }) |filename| {
+        comptime var nameSplit = std.mem.split(std.fs.path.basename(filename), ".");
+        comptime var name = nameSplit.next().?;
+        const exe = b.addExecutable(name, filename);
+        exe.setTarget(target);
+        exe.setBuildMode(mode);
+        exe.install();
+    }
 }
