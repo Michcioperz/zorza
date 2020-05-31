@@ -5,6 +5,7 @@ pub fn build(b: *Builder) void {
     const target = b.standardTargetOptions(.{});
     b.setPreferredReleaseMode(.ReleaseSmall);
     const mode = b.standardReleaseOptions();
+    const bloat = b.option(bool, "bloat", "be additionally snarky about every single unnecessary kilobyte") orelse false;
 
     inline for (.{
         "src/zorza.zig",
@@ -21,6 +22,10 @@ pub fn build(b: *Builder) void {
         comptime var nameSplit = std.mem.split(std.fs.path.basename(filename), ".");
         comptime var name = nameSplit.next().?;
         const exe = b.addExecutable(name, filename);
+        if (bloat) {
+            exe.single_threaded = true;
+            exe.strip = true;
+        }
         exe.setTarget(target);
         exe.setBuildMode(mode);
         exe.install();
